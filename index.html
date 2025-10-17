@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dziennik Treningowy</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet" />
+
   <style>
     * { box-sizing: border-box; }
     body {
@@ -13,20 +15,115 @@
       color: #ffffff;
       padding: 20px;
     }
+.exercise-card h3 {
+  text-align: center;
+  color: #FF9800;
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
 .exercise-card {
-  background-color: #2a2a2a;
+  background: linear-gradient(145deg, #222222, #2f2f2f);
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 25px;
-  box-shadow: 0 0 10px rgba(0, 255, 179, 0.1);
-  transition: transform 0.2s ease;
+  box-shadow:  5px 5px 15px #171717,
+               -5px -5px 15px #3a3a3a;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
+
 .exercise-card:hover {
-  transform: scale(1.01);
+  transform: scale(1.03);
+  box-shadow: 8px 8px 20px #0fffc1,
+              -8px -8px 20px #00b377;
+}
+
+button {
+  background: linear-gradient(135deg, #00FFB3, #00d19a);
+  color: #000;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 255, 179, 0.4);
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-weight: 600;
+}
+@keyframes fadeInHighlight {
+  0% {
+    background-color: #00FFB3;
+    opacity: 0;
+  }
+  100% {
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+.fade-in-highlight {
+  animation: fadeInHighlight 1s ease forwards;
+}
+
+label[for="importInput"] {
+  background: linear-gradient(135deg, #CF6679, #B04F64);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(207, 102, 121, 0.5);
+  transition: background 0.3s, box-shadow 0.3s;
+  display: inline-block;
+  text-align: center;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+h1, h2, h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  color: #00FFB3;
+}
+
+label[for="importInput"]:hover {
+  background: linear-gradient(135deg, #B04F64, #8C3B4E);
+  box-shadow: 0 6px 12px rgba(207, 102, 121, 0.8);
+}
+
+button:hover {
+  background: linear-gradient(135deg, #00d19a, #00b377);
+  box-shadow: 0 6px 12px rgba(0, 255, 179, 0.7);
 }
     h1, h2, h3 {
       color: #00FFB3;
     }
+h2 {
+  margin-top: 10px;
+  text-align: center;
+}
+h1 {
+  text-align: center;
+}
+#newDayForm {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+#daySelector {
+  display: block;
+  margin: 10px auto 20px auto;
+  max-width: 300px; /* opcjonalnie, by select nie był za szeroki */
+  width: 100%;
+  text-align: center;
+}
     .container {
       max-width: 900px;
       margin: 0 auto;
@@ -50,6 +147,9 @@
       background-color: #2a2a2a;
       color: #fff;
     }
+h2 {
+  margin-top: 10px;
+}
     button {
       background-color: #00FFB3;
       color: #000;
@@ -79,35 +179,63 @@
     tr:hover {
       background-color: #2a2a2a;
     }
-    .chart-container {
-      width: 100%;
-      height: 300px;
-      margin-top: 20px;
-    }
+   .chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 30px; /* większy odstęp od tabeli */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Dziennik Treningowy</h1>
 
-    <form id="newDayForm">
-      <input type="date" id="dayDate" required />
-      <button type="submit">Dodaj dzień treningowy</button>
-    </form>
+<h2>📅 Wybierz istniejący dzień treningowy</h2>
+<select id="daySelector" style="margin-bottom: 20px;"></select>
 
-    <label for="daySelector">Wybierz dzień:</label>
-    <select id="daySelector"></select>
+<h2>➕ Dodaj nowy dzień treningowy</h2>
+<form id="newDayForm" style="display: flex; gap: 10px; flex-wrap: wrap;">
+  <input type="date" id="dayDate" required />
+  <button type="submit">Dodaj</button>
+</form>
+
 
     <div id="currentDayContainer"></div>
-<div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-  <button id="exportBtn" style="background-color:#00FFB3; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; color:#000;">
-    Eksportuj dane (backup)
+<div style="margin-top: 30px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+  <button id="exportBtn" style="
+    background-color: #FFD54F; /* Material Amber */
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  ">
+    📤 Eksportuj dane
   </button>
-  <label for="importInput" style="background-color:#00FFB3; padding:10px 15px; border-radius:5px; color:#000; cursor:pointer; user-select:none;">
-    Importuj dane (przywróć)
+
+  <label for="importInput" style="
+    background-color: #CF6679; /* Material Error Red */
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+  ">
+    📥 Importuj dane
   </label>
+
   <input type="file" id="importInput" accept=".json" style="display:none" />
 </div>
+
 
   </div>
 
@@ -148,6 +276,7 @@
 
     function renderCurrentDay() {
       const day = days.find(d => d.date === currentDay);
+
       if (!day) {
         currentDayContainer.innerHTML = '<p>Brak danych na ten dzień.</p>';
         return;
@@ -156,14 +285,15 @@
       currentDayContainer.innerHTML = `
         <h2>Trening z dnia: ${day.date}</h2>
         <form id="exerciseForm">
-          <input type="text" id="exerciseName" placeholder="Nazwa ćwiczenia" required />
+          <input list="exerciseList" type="text" id="exerciseName" placeholder="Nazwa ćwiczenia" required />
+<datalist id="exerciseList"></datalist>
           <input type="number" id="reps" placeholder="Powtórzenia" min="1" required />
           <input type="number" id="weight" placeholder="Ciężar (kg)" min="0" step="0.5" required />
           <button type="submit">Dodaj serię</button>
         </form>
         <div id="exercisesList"></div>
       `;
-
+	updateExerciseList();
       const form = document.getElementById('exerciseForm');
       const nameInput = document.getElementById('exerciseName');
       const repsInput = document.getElementById('reps');
@@ -179,52 +309,119 @@
         }
       });
 
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = nameInput.value.trim();
-        const reps = parseInt(repsInput.value);
-        const weight = parseFloat(weightInput.value);
-        if (!name) return;
+     form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const name = nameInput.value.trim();
+  const reps = parseInt(repsInput.value);
+  const weight = parseFloat(weightInput.value);
+  if (!name) return;
 
-        if (!day.exercises[name]) {
-          day.exercises[name] = [];
-        }
-        const setNum = day.exercises[name].length + 1;
-        day.exercises[name].push({ set: setNum, reps, weight });
-        saveToStorage();
-        renderCurrentDay();
-      });
+ if (!day.exercises[name]) {
+  day.exercises[name] = [];
+}
+const sets = day.exercises[name];
+const setNum = sets.length + 1;
+sets.push({ set: setNum, reps, weight });
+
+saveToStorage();
+renderCurrentDay();
+
+  nameInput.value = '';
+  repsInput.value = '';
+  weightInput.value = '';
+});
+
 
       renderExercises(day);
     }
 
     function renderExercises(day) {
-      const exListDiv = document.getElementById('exercisesList');
-      exListDiv.innerHTML = '';
+  const exListDiv = document.getElementById('exercisesList');
+  exListDiv.innerHTML = '';
 
-      for (const [name, sets] of Object.entries(day.exercises)) {
-        const exDiv = document.createElement('div');
-exDiv.className = 'exercise-card'; // zamiast 'exercise'
+  for (const [name, sets] of Object.entries(day.exercises)) {
+    const exDiv = document.createElement('div');
+    exDiv.className = 'exercise-card';
 
-        let tableHtml = `
-          <h3>${name}</h3>
-          <table>
-            <thead><tr><th>Seria</th><th>Powtórzenia</th><th>Kg</th></tr></thead>
-            <tbody>
-        `;
+    let tableHtml = `
+      <h3>${name}</h3>
+      <table>
+        <thead><tr><th>Seria</th><th>Powtórzenia</th><th>Kg</th></tr></thead>
+        <tbody>
+    `;
 
-        sets.forEach(s => {
-          tableHtml += `<tr><td>${s.set}</td><td>${s.reps}</td><td>${s.weight}</td></tr>`;
-        });
+    sets.forEach(s => {
+      tableHtml += `<tr><td>${s.set}</td><td>${s.reps}</td><td>${s.weight}</td></tr>`;
+    });
 
-        tableHtml += `</tbody></table>`;
-        tableHtml += `<div class="chart-container"><canvas id="chart-${name}"></canvas></div>`;
-        exDiv.innerHTML = tableHtml;
-        exListDiv.appendChild(exDiv);
+
+    tableHtml += `</tbody></table>`;
+
+    tableHtml += `
+      <form class="add-set-form" data-exercise="${name}" style="
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+      ">
+        <input type="number" name="reps" placeholder="Powtórzenia" min="1" required style="width: 90px; text-align: center;" />
+        <input type="number" name="weight" placeholder="Kg" min="0" step="0.5" required style="width: 90px; text-align: center;" />
+        <button type="submit" style="
+          background-color:#FF9800; color:#000; border:none; border-radius:5px; padding:6px 14px; cursor:pointer;
+          font-weight: 600;
+        ">Dodaj serię</button>
+      </form>
+    `;
+
+    tableHtml += `<div class="chart-container"><canvas id="chart-${name}"></canvas></div>`;
+    exDiv.innerHTML = tableHtml;
+    exListDiv.appendChild(exDiv);
+ // Po wstawieniu tabeli do DOM, znajdź tbody i ostatni wiersz
+    const tbody = exDiv.querySelector('tbody');
+    if (tbody) {
+      const rows = tbody.querySelectorAll('tr');
+      if (rows.length > 0) {
+        rows[rows.length - 1].classList.add('fade-in-highlight');
       }
-
-      generateCharts(day);
     }
+  }
+
+  generateCharts(day);
+
+  document.querySelectorAll('.add-set-form').forEach(form => {
+    // Wypełnij pola autouzupełnieniem na podstawie ostatniej serii historycznej:
+    const exerciseName = form.dataset.exercise;
+    const lastSet = getLastSetForExercise(exerciseName);
+    if (lastSet) {
+      form.reps.value = lastSet.reps;
+      form.weight.value = lastSet.weight;
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const exerciseName = form.dataset.exercise;
+      const reps = parseInt(form.reps.value);
+      const weight = parseFloat(form.weight.value);
+      if (!exerciseName || !reps || !weight) return;
+
+      const day = days.find(d => d.date === currentDay);
+      if (!day) return;
+
+      if (!day.exercises[exerciseName]) {
+        day.exercises[exerciseName] = [];
+      }
+      const sets = day.exercises[exerciseName];
+      const setNum = sets.length + 1;
+      sets.push({ set: setNum, reps, weight });
+
+      saveToStorage();
+      renderCurrentDay();
+    });
+  });
+}
+
 
     function getLastSetForExercise(exerciseName) {
       const all = [...days].reverse();
@@ -341,6 +538,23 @@ document.getElementById('importInput').addEventListener('change', (event) => {
   event.target.value = '';
 });
 
+function updateExerciseList() {
+  const datalist = document.getElementById('exerciseList');
+  if (!datalist) return; // nic nie robimy jeśli brak elementu
+
+  const exerciseSet = new Set();
+  days.forEach(day => {
+    Object.keys(day.exercises).forEach(name => exerciseSet.add(name));
+  });
+
+  datalist.innerHTML = '';
+  exerciseSet.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    datalist.appendChild(option);
+  });
+}
+
 
     newDayForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -360,6 +574,7 @@ document.getElementById('importInput').addEventListener('change', (event) => {
     });
 
     loadFromStorage();
+
     renderDaySelector();
     renderCurrentDay();
   </script>
