@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dziennik Treningowy</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      padding: 20px;
+    }
+.exercise-card {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 0 10px rgba(0, 255, 179, 0.1);
+  transition: transform 0.2s ease;
+}
+.exercise-card:hover {
+  transform: scale(1.01);
+}
+    h1, h2, h3 {
+      color: #00FFB3;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0, 255, 179, 0.2);
+    }
+    form {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+    input, select {
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    button {
+      background-color: #00FFB3;
+      color: #000;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #00d19a;
+    }
+    .exercise {
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    th {
+      background-color: #2c2c2c;
+      color: #00FFB3;
+    }
+    tr:hover {
+      background-color: #2a2a2a;
+    }
+    .chart-container {
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dziennik Treningowy</h1>
+
+    <form id="newDayForm">
+      <input type="date" id="dayDate" required />
+      <button type="submit">Dodaj dzień treningowy</button>
+    </form>
+
+    <label for="daySelector">Wybierz dzień:</label>
+    <select id="daySelector"></select>
+
+    <div id="currentDayContainer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let days = [];
+    let currentDay = null;
+
+    const dayDateInput = document.getElementById('dayDate');
+    const newDayForm = document.getElementById('newDayForm');
+    const daySelector = document.getElementById('daySelector');
+    const currentDayContainer = document.getElementById('currentDayContainer');
+
+    function saveToStorage() {
+      localStorage.setItem('trainingDays', JSON.stringify(days));
+    }
+
+    function loadFromStorage() {
+      const raw = localStorage.getItem('trainingDays');
+      if (raw) {
+        days = JSON.parse(raw);
+        if (days.length > 0) {
+          currentDay = days[days.length - 1].date;
+        }
+      }
+    }
+
+    function renderDaySelector() {
+      daySelector.innerHTML = '';
+      days.forEach(day => {
+        const option = document.createElement('option');
+        option.value = day.date;
+        option.textContent = day.date;
+        if (day.date === currentDay) option.selected = true;
+        daySelector.appendChild(option);
+      });
+    }
+
+    function renderCurrentDay() {
+      const day = days.find(d => d.date === currentDay);
+      if (!day) {
+        currentDayContainer.innerHTML = '<p>Brak danych na ten dzień.</p>';
+        return;
+      }
+
+      currentDayContainer.innerHTML = `
+        <h2>Trening z dnia: ${day.date}</h2>
+        <form id="exerciseForm">
+          <input type="text" id="exerciseName" placeholder="Nazwa ćwiczenia" required />
+          <input type="number" id="reps" placeholder="Powtórzenia" min="1" required />
+          <input type="number" id="weight" placeholder="Ciężar (kg)" min="0" step="0.5" required />
+          <button type="submit">Dodaj serię</button>
+        </form>
+        <div id="exercisesList"></div>
+      `;
+
+      const form = document.getElementById('exerciseForm');
+      const nameInput = document.getElementById('exerciseName');
+      const repsInput = document.getElementById('reps');
+      const weightInput = document.getElementById('weight');
+
+      // Autouzupełnianie po wpisaniu ćwiczenia
+      nameInput.addEventListener('change', () => {
+        const name = nameInput.value.trim();
+        const history = getLastSetForExercise(name);
+        if (history) {
+          repsInput.value = history.reps;
+          weightInput.value = history.weight;
+        }
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        const reps = parseInt(repsInput.value);
+        const weight = parseFloat(weightInput.value);
+        if (!name) return;
+
+        if (!day.exercises[name]) {
+          day.exercises[name] = [];
+        }
+        const setNum = day.exercises[name].length + 1;
+        day.exercises[name].push({ set: setNum, reps, weight });
+        saveToStorage();
+        renderCurrentDay();
+      });
+
+      renderExercises(day);
+    }
+
+    function renderExercises(day) {
+      const exListDiv = document.getElementById('exercisesList');
+      exListDiv.innerHTML = '';
+
+      for (const [name, sets] of Object.entries(day.exercises)) {
+        const exDiv = document.createElement('div');
+exDiv.className = 'exercise-card'; // zamiast 'exercise'
+
+        let tableHtml = `
+          <h3>${name}</h3>
+          <table>
+            <thead><tr><th>Seria</th><th>Powtórzenia</th><th>Kg</th></tr></thead>
+            <tbody>
+        `;
+
+        sets.forEach(s => {
+          tableHtml += `<tr><td>${s.set}</td><td>${s.reps}</td><td>${s.weight}</td></tr>`;
+        });
+
+        tableHtml += `</tbody></table>`;
+        tableHtml += `<div class="chart-container"><canvas id="chart-${name}"></canvas></div>`;
+        exDiv.innerHTML = tableHtml;
+        exListDiv.appendChild(exDiv);
+      }
+
+      generateCharts(day);
+    }
+
+    function getLastSetForExercise(exerciseName) {
+      const all = [...days].reverse();
+      for (let day of all) {
+        if (day.exercises[exerciseName] && day.exercises[exerciseName].length > 0) {
+          return day.exercises[exerciseName].slice(-1)[0];
+        }
+      }
+      return null;
+    }
+
+    function generateCharts(currentDayObj) {
+  for (const name of Object.keys(currentDayObj.exercises)) {
+    const canvas = document.getElementById(`chart-${name}`);
+    if (!canvas) continue;
+
+    const data = [];
+
+    days.forEach(d => {
+      if (d.exercises[name]) {
+        // Znajdź serię z maksymalnym ciężarem
+        const maxSet = d.exercises[name].reduce((max, set) => 
+          set.weight > max.weight ? set : max, { weight: 0, reps: 0 });
+        data.push({
+          date: d.date,
+          weight: maxSet.weight,
+          reps: maxSet.reps
+        });
+      }
+    });
+
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: data.map(d => d.date),
+        datasets: [{
+          label: `Postęp - ${name}`,
+          data: data.map(d => d.weight),
+          borderColor: 'rgba(0,255,179,1)',
+          backgroundColor: 'rgba(0,255,179,0.2)',
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: 'rgba(0,255,179,1)'
+        }]
+      },
+      options: {
+        scales: {
+          x: { ticks: { color: '#fff' }, grid: { color: '#333' } },
+          y: { ticks: { color: '#fff' }, grid: { color: '#333' } }
+        },
+        plugins: {
+          legend: { labels: { color: '#fff' } },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const idx = context.dataIndex;
+                const reps = data[idx].reps;
+                const weight = context.dataset.data[idx];
+                return `${weight} kg (${reps} powt.)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+
+    newDayForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const date = dayDateInput.value;
+      if (!date || days.find(d => d.date === date)) return;
+      days.push({ date, exercises: {} });
+      currentDay = date;
+      saveToStorage();
+      renderDaySelector();
+      renderCurrentDay();
+      dayDateInput.value = '';
+    });
+
+    daySelector.addEventListener('change', function () {
+      currentDay = this.value;
+      renderCurrentDay();
+    });
+
+    loadFromStorage();
+    renderDaySelector();
+    renderCurrentDay();
+  </script>
+</body>
+</html>
