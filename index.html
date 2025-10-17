@@ -99,6 +99,16 @@
     <select id="daySelector"></select>
 
     <div id="currentDayContainer"></div>
+<div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+  <button id="exportBtn" style="background-color:#00FFB3; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; color:#000;">
+    Eksportuj dane (backup)
+  </button>
+  <label for="importInput" style="background-color:#00FFB3; padding:10px 15px; border-radius:5px; color:#000; cursor:pointer; user-select:none;">
+    Importuj dane (przywróć)
+  </label>
+  <input type="file" id="importInput" accept=".json" style="display:none" />
+</div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -284,6 +294,52 @@ exDiv.className = 'exercise-card'; // zamiast 'exercise'
     });
   }
 }
+// Eksport danych do pliku JSON
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const dataStr = JSON.stringify(days, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'training_backup.json';
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+// Import danych z pliku JSON
+document.getElementById('importInput').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      // Walidacja minimalna — czy to tablica i czy jest sensowna struktura
+      if (!Array.isArray(importedData)) throw new Error('Niepoprawny format danych');
+
+      // Nadpisujemy obecne dane
+      days = importedData;
+      if (days.length > 0) currentDay = days[days.length - 1].date;
+      else currentDay = null;
+
+      saveToStorage();
+      renderDaySelector();
+      renderCurrentDay();
+
+      alert('Dane zostały zaimportowane poprawnie!');
+    } catch (err) {
+      alert('Błąd przy imporcie danych: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+
+  // Czyścimy input, żeby można było zaimportować ten sam plik ponownie
+  event.target.value = '';
+});
 
 
     newDayForm.addEventListener('submit', function(e) {
