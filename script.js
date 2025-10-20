@@ -48,7 +48,7 @@ function renderCurrentDay() {
   }
 
   currentDayContainer.innerHTML = `
-        <h2>Trening z dnia: ${day.date}</h2>
+        <h2>${day.date}</h2>
         <form id="exerciseForm">
           <input list="exerciseList" type="text" id="exerciseName" placeholder="Nazwa ćwiczenia" required />
 <datalist id="exerciseList"></datalist>
@@ -120,10 +120,10 @@ function renderExercises(day) {
         align-items: center;
         justify-content: center;
       ">
-        <input type="number" name="reps" placeholder="Powtórzenia" min="1" required style="width: 90px; text-align: center;" />
-        <input type="number" name="weight" placeholder="Kg" min="0" step="0.5" required style="width: 90px; text-align: center;" />
+        <input type="number" name="reps" placeholder="Powtórzenia" min="1" required style="width: 140px; text-align: center;" />
+        <input type="number" name="weight" placeholder="Kg" min="0" step="0.5" required style="width: 140px; text-align: center;" />
         <button type="submit" style="
-          background-color:#FF9800; color:#000; border:none; border-radius:5px; padding:6px 14px; cursor:pointer;
+          background-color:#FF9800; color:#000; border:none; border-radius:5px; cursor:pointer;
           font-weight: 600;
         ">Dodaj serię</button>
       </form>
