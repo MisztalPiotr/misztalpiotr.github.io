@@ -109,15 +109,7 @@ h1 {
   flex-wrap: nowrap;
   margin-bottom: 10px;
 }
-#newDayForm input[type="date"] {
-  width: 140px;
-}
 
-#newDayForm button {
-  padding: 6px 12px;
-  font-size: 0.9rem;
-  border-radius: 6px;
-}
 #daySelector {
   display: block;
   margin: 10px auto 20px auto;

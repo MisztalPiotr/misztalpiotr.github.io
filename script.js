@@ -120,8 +120,8 @@ function renderExercises(day) {
         align-items: center;
         justify-content: center;
       ">
-        <input type="number" name="reps" placeholder="Powtórzenia" min="1" required style="width: 140px; text-align: center;" />
-        <input type="number" name="weight" placeholder="Kg" min="0" step="0.5" required style="width: 140px; text-align: center;" />
+        <input type="number" name="reps" placeholder="Powtórzenia" min="1" required style="width: 120px; text-align: center;" />
+        <input type="number" name="weight" placeholder="Kg" min="0" step="0.5" required style="width: 120px; text-align: center;" />
         <button type="submit" style="
           background-color:#FF9800; color:#000; border:none; border-radius:5px; cursor:pointer;
           font-weight: 600;
@@ -344,3 +344,6 @@ hamburger.addEventListener("click", () => {
   menu.classList.toggle("hidden");
   hamburger.classList.toggle("rotated");
 });
+hamburger.style.transform = "rotate(0deg)";
+void hamburger.offsetWidth; // force repaint
+hamburger.classList.toggle("rotated");
