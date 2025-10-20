@@ -342,4 +342,5 @@ const menu = document.getElementById("menu");
 
 hamburger.addEventListener("click", () => {
   menu.classList.toggle("hidden");
+  hamburger.classList.toggle("rotated");
 });
