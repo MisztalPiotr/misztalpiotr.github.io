@@ -6,6 +6,14 @@ const newDayForm = document.getElementById("newDayForm");
 const daySelector = document.getElementById("daySelector");
 const currentDayContainer = document.getElementById("currentDayContainer");
 
+
+// Ustaw dzisiejszą datę jako wartość domyślną
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, "0"); // miesiące są od 0
+const dd = String(today.getDate()).padStart(2, "0");
+
+dayDateInput.value = `${yyyy}-${mm}-${dd}`;
 function saveToStorage() {
   localStorage.setItem("trainingDays", JSON.stringify(days));
 }
@@ -44,8 +52,6 @@ function renderCurrentDay() {
         <form id="exerciseForm">
           <input list="exerciseList" type="text" id="exerciseName" placeholder="Nazwa ćwiczenia" required />
 <datalist id="exerciseList"></datalist>
-          <input type="number" id="reps" placeholder="Powtórzenia" min="1" required />
-          <input type="number" id="weight" placeholder="Ciężar (kg)" min="0" step="0.5" required />
           <button type="submit">Dodaj serię</button>
         </form>
         <div id="exercisesList"></div>
@@ -59,33 +65,27 @@ function renderCurrentDay() {
   // Autouzupełnianie po wpisaniu ćwiczenia
   nameInput.addEventListener("change", () => {
     const name = nameInput.value.trim();
-    const history = getLastSetForExercise(name);
-    if (history) {
-      repsInput.value = history.reps;
-      weightInput.value = history.weight;
-    }
+    // const history = getLastSetForExercise(name);
+    // if (history) {
+    //   repsInput.value = history.reps;
+    //   weightInput.value = history.weight;
+    // }
   });
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     const name = nameInput.value.trim();
-    const reps = parseInt(repsInput.value);
-    const weight = parseFloat(weightInput.value);
     if (!name) return;
 
     if (!day.exercises[name]) {
       day.exercises[name] = [];
     }
-    const sets = day.exercises[name];
-    const setNum = sets.length + 1;
-    sets.push({ set: setNum, reps, weight });
-
+    
     saveToStorage();
     renderCurrentDay();
 
     nameInput.value = "";
-    repsInput.value = "";
-    weightInput.value = "";
+    
   });
 
   renderExercises(day);

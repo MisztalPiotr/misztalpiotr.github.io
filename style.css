@@ -6,7 +6,7 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #121212;
   color: #ffffff;
-  padding: 20px;
+  padding: 0px;
 }
 .exercise-card h3 {
   text-align: center;
@@ -24,10 +24,7 @@ body {
   transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-.exercise-card:hover {
-  transform: scale(1.03);
-  box-shadow: 8px 8px 20px #0fffc1, -8px -8px 20px #00b377;
-}
+
 
 button {
   background: linear-gradient(135deg, #00ffb3, #00d19a);
@@ -314,3 +311,11 @@ header h1 {
     flex-wrap: wrap;
   }
 }
+@media (max-width: 500px) {
+  .container {
+    max-width: 99%;       /* zajmuje prawie cały ekran */
+    padding: 0px;        /* mniejszy padding */
+    box-shadow: 0 0 10px rgba(0, 255, 179, 0.2);
+  }
+}
+
