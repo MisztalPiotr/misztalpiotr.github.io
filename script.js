@@ -95,7 +95,12 @@ function renderExercises(day) {
   const exListDiv = document.getElementById("exercisesList");
   exListDiv.innerHTML = "";
 
-  for (const [name, sets] of Object.entries(day.exercises)) {
+  // 🔁 Iteruj od końca, aby nowe ćwiczenia były na górze
+  const exerciseNames = Object.keys(day.exercises);
+  for (let i = exerciseNames.length - 1; i >= 0; i--) {
+    const name = exerciseNames[i];
+    const sets = day.exercises[name];
+
     const exDiv = document.createElement("div");
     exDiv.className = "exercise-card";
 
@@ -131,8 +136,10 @@ function renderExercises(day) {
 
     tableHtml += `<div class="chart-container"><canvas id="chart-${name}"></canvas></div>`;
     exDiv.innerHTML = tableHtml;
+
+    // ⬆️ Nie trzeba już prepend — zwykłe append zachowa właściwą kolejność
     exListDiv.appendChild(exDiv);
-    // Po wstawieniu tabeli do DOM, znajdź tbody i ostatni wiersz
+
     const tbody = exDiv.querySelector("tbody");
     if (tbody) {
       const rows = tbody.querySelectorAll("tr");
@@ -145,7 +152,6 @@ function renderExercises(day) {
   generateCharts(day);
 
   document.querySelectorAll(".add-set-form").forEach((form) => {
-    // Wypełnij pola autouzupełnieniem na podstawie ostatniej serii historycznej:
     const exerciseName = form.dataset.exercise;
     const lastSet = getLastSetForExercise(exerciseName);
     if (lastSet) {
@@ -167,6 +173,7 @@ function renderExercises(day) {
       if (!day.exercises[exerciseName]) {
         day.exercises[exerciseName] = [];
       }
+
       const sets = day.exercises[exerciseName];
       const setNum = sets.length + 1;
       sets.push({ set: setNum, reps, weight });
@@ -176,6 +183,8 @@ function renderExercises(day) {
     });
   });
 }
+
+
 
 function getLastSetForExercise(exerciseName) {
   const all = [...days].reverse();
